@@ -6,7 +6,6 @@ import { auth, provider } from './firebase.js'
 import BSnavbar from './components/BSnavbar';
 import ToolHome from './components/tool_home';
 import ProjectHome from './components/project_home';
-import AboutMe from './components/about_me';
 import NWmap from './components/nwmap';
 import './index.css';
 
@@ -20,7 +19,7 @@ class App extends Component {
             menuItems: [
                 {name: "Tools", path: "/tools"}, 
                 {name: "Projects", path: "/projects"}, 
-                {name: "About", path: "/about"}
+                {name: "Map", path: "/about"}
             ],
             username: '',
             user: null
@@ -51,8 +50,7 @@ class App extends Component {
                 <div role="main" className="row">
                     <Route exact path="/tools" component={ToolHome}/>
                     <Route path="/tools/nwmap" component={NWmap} />
-                    <Route path="/projects" component={ProjectHome}/>
-                    <Route path="/about" component={AboutMe}/>
+                    <Route path="/rosters" component={ProjectHome}/>
                 </div>
             </div>
         </BrowserRouter>

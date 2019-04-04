@@ -5,7 +5,7 @@ import firebase, { db } from '../firebase';
 
 import MapImage from '../images/CombinedNW.png';
 import { iconPeak, iconLandmark, iconConstruction } from './icons.js';
-import PopUpMarker from './nwmap/PopUpMarker';
+import NewMarker from './nwmap/NewMarker';
 
 function iconFromType(type){
     switch(type){
@@ -17,29 +17,25 @@ function iconFromType(type){
             return iconConstruction;       
     }
 }
-const NewMarker = props => {
-    return(
-        <PopUpMarker 
-            icon={iconPeak}
-            position={props.position}>
-            <Popup>
-              <form onSubmit={props.handleSubmit}>
-                <input type="text" name="newType" placeholder="What is this?" onChange={props.handleChange} value={props.newType} />
-                <input type="text" name="newNotes" placeholder="What are you bringing ?" onChange={props.handleChange} value={props.newNotes} />
-                <button>Save</button>
-              </form>
-            </Popup>
-        </PopUpMarker>
-    );
-};
 
 const MarkerList = props =>{
     //props.markers will be an array of marker objects
     
     //cycle through each element of the array.
-    const markerlist = props.markers.map((marker, index) =>
+    const markerlist = props.markers.map((marker, index) => {
         //console.log(marker);
-        <Marker icon={iconFromType(marker.type)} key={index} position={marker.latlong}><Popup>{marker.type}: {marker.notes}</Popup></Marker>
+        
+        const dateAdded = (marker.addedOn) ? new Date(marker.addedOn) : null ;
+        console.log(marker.id + " - " +marker.addedOn);
+        return(
+        <Marker icon={iconFromType(marker.type)} key={index} position={marker.latlong}>
+            <Popup>
+                <div className='marker_header'>{marker.type}</div>
+                <div className='marker_notes'>{marker.notes}</div>
+                { (marker.addedBy && marker.addedOn) ? <div className='marker_source'>-{marker.addedBy} on </div> : null }
+            </Popup>
+        </Marker>
+        );}
     );
     return markerlist;
 };
@@ -85,14 +81,16 @@ class NWmap extends Component {
         this.setState({markers});      
     };
 
-        handleSubmit = (e) => {
+    handleSubmit = (e) => {
         e.preventDefault();
         var user = firebase.auth().currentUser;
+        const now = new Date();
         var newPoint = {
             addedBy: user.email,
             type: this.state.newType,
             notes: this.state.newNotes,
-            latlong: {lat: this.state.newMarkerLatLong.lat, lng: this.state.newMarkerLatLong.lng}
+            latlong: {lat: this.state.newMarkerLatLong.lat, lng: this.state.newMarkerLatLong.lng},
+            addedOn: now
         };
         //{ Lat: 100, Lng: -100 }
         //latlong: this.state.newMarkerLatLong
