@@ -4,15 +4,19 @@ import { CRS } from 'leaflet';
 import firebase, { db } from '../firebase';
 
 import MapImage from '../images/CombinedNW.png';
-import { iconPeak, iconLandmark, iconConstruction } from './icons.js';
+import { iconPeak, iconLandmark, iconConstruction, iconSimpleBrown, iconSimpleGrey, iconSimpleGold, iconSimpleDarkPurple } from './nwmap/icons.js';
 import NewMarker from './nwmap/NewMarker';
 
 function iconFromType(type){
     switch(type){
-        case 'stone':
-            return iconPeak;
         case 'wood':
-            return iconLandmark;
+            return iconSimpleBrown;
+        case 'stone':
+            return iconSimpleDarkPurple;
+        case 'iron':
+            return iconSimpleGrey;
+        case 'chest':
+            return iconSimpleGold;
         default:
             return iconConstruction;       
     }
@@ -26,9 +30,9 @@ const MarkerList = props =>{
         //console.log(marker);
         
         const dateAdded = (marker.addedOn) ? new Date(marker.addedOn) : null ;
-        console.log(marker.id + " - " +marker.addedOn);
+        console.log(marker.key + " - Added on:" + marker.addedOn);
         return(
-        <Marker icon={iconFromType(marker.type)} key={index} position={marker.latlong}>
+        <Marker icon={iconFromType(marker.type)} key={marker.key} position={marker.latlong}>
             <Popup>
                 <div className='marker_header'>{marker.type}</div>
                 <div className='marker_notes'>{marker.notes}</div>
@@ -53,31 +57,19 @@ class NWmap extends Component {
             lng: 0,
             zoom: 0,
             newMarkerLatLong: {},
-            markers: [
-                {
-                addedBy: "dave",
-                addedOn: "April 1, 2019",
-                type: "stone",
-                notes: 'stone here',
-                latlong: {lat: 156, lng: -377}},
-                {
-                type: "wood",
-                notes: 'big wood',
-                latlong: {lat: 20, lng: -238.875}},
-                {
-                type: "default",
-                notes: 'small wood',
-                latlong: {lat: 30, lng: -209.625}}
-            ]                
+            markers: [],
+            resources: ['wood', 'stone', 'iron', 'chest']
             };
     };
     onCollectionUpdate = (points) =>{
         var markers = [];
         points.forEach( (point) =>{
-            markers.push(point.data());
-            console.log(point.data()); 
+            let pointObj = point.data();
+            pointObj["key"] = point.id;
+            console.log(pointObj);
+            markers.push(pointObj);
         });
-        console.log(markers);
+        //console.log(markers);
         this.setState({markers});      
     };
 
@@ -100,7 +92,7 @@ class NWmap extends Component {
             newMarker: false,
             newType: '',
             newNotes: ''
-        })
+        });
         
     };
     handleChange = (e) => {
@@ -122,7 +114,7 @@ class NWmap extends Component {
       this.unsubscribe = this.refPoints.onSnapshot(this.onCollectionUpdate);
     }
     render(){
-        const position = this.state.markers[1].latlong;//[this.state.lat, this.state.lng];
+        const mapCenter = [0,0];
         const overstyle = {
             border: '1px solid',
             width: '100%'
@@ -132,7 +124,7 @@ class NWmap extends Component {
             <div style={overstyle}>
                 <h4>New World</h4>
                 <Map 
-                    center={position}
+                    center={mapCenter}
                     zoom={this.state.zoom}
                     crs={CRS.Simple}
                     doubleClickZoom={false}
@@ -142,8 +134,8 @@ class NWmap extends Component {
                     url={MapImage}
                     bounds={bounds}
                   />
-                  {this.state.newMarker ? <NewMarker position={this.state.newMarkerLatLong} handleSubmit={this.handleSubmit} handleChange={this.handleChange} newNotes={this.state.newNotes} newType={this.state.newType}/> : null}
-                  {this.state.markers ? <MarkerList markers={this.state.markers} /> : null}
+                  {this.state.newMarker ? <NewMarker position={this.state.newMarkerLatLong} resources={this.state.resources} handleSubmit={this.handleSubmit} handleChange={this.handleChange} newNotes={this.state.newNotes} newType={this.state.newType}/> : null}
+                  {this.state.markers !== [] ? <MarkerList markers={this.state.markers} /> : null}
                 </Map>
             </div>
         );
