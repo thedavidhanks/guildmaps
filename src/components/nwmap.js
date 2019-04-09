@@ -30,8 +30,8 @@ const MarkerList = props =>{
     const markerlist = props.markers.map((marker, index) => {
         //console.log(marker);
         
-        const dateAdded = (marker.addedOn) ? new Date(marker.addedOn) : null ;
-        //console.log(marker.key + " - Added on:" + marker.addedOn);
+        const dateAdded = (marker.addedOn) ? marker.addedOn.toDate() : null ;
+        console.log(dateAdded);
         return(
         <Marker icon={iconFromType(marker.type)} key={marker.key} position={marker.latlong}>
             <Popup>
@@ -115,12 +115,13 @@ class NWmap extends Component {
       this.unsubscribe = this.refPoints.onSnapshot(this.onCollectionUpdate);
     }
     render(){
-        const mapCenter = [10177,4887];
+        const mapCenter = [4887,10078];
         const overstyle = {
             border: '1px solid',
             width: '100%'
         };
-        const bounds = [[5840,-62.3],[14314,9835]];      
+        //const bounds = [[5840,-62.3],[14314,9835]];     
+        const bounds = [[-62, 5841],[9835, 14316]];      
         return (
             <div style={overstyle}>
                 <h4>New World</h4>
