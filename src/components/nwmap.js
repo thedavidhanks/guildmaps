@@ -3,8 +3,9 @@ import { ImageOverlay, Map, Marker, Popup } from 'react-leaflet';
 import { CRS } from 'leaflet';
 import firebase, { db } from '../firebase';
 
-import MapImage from '../images/CombinedNW.png';
-import { iconPeak, iconLandmark, iconConstruction, iconSimpleBrown, iconSimpleGrey, iconSimpleGold, iconSimpleDarkPurple } from './nwmap/icons.js';
+//import MapImage from '../images/CombinedNW.png';
+import MapImage from './nwmap/New_World_Map_Dec_18.png';
+import { iconConstruction, iconSimpleBrown, iconSimpleGrey, iconSimpleGold, iconSimpleDarkPurple } from './nwmap/icons.js';
 import NewMarker from './nwmap/NewMarker';
 
 function iconFromType(type){
@@ -30,7 +31,7 @@ const MarkerList = props =>{
         //console.log(marker);
         
         const dateAdded = (marker.addedOn) ? new Date(marker.addedOn) : null ;
-        console.log(marker.key + " - Added on:" + marker.addedOn);
+        //console.log(marker.key + " - Added on:" + marker.addedOn);
         return(
         <Marker icon={iconFromType(marker.type)} key={marker.key} position={marker.latlong}>
             <Popup>
@@ -66,7 +67,7 @@ class NWmap extends Component {
         points.forEach( (point) =>{
             let pointObj = point.data();
             pointObj["key"] = point.id;
-            console.log(pointObj);
+            //console.log(pointObj);
             markers.push(pointObj);
         });
         //console.log(markers);
@@ -114,12 +115,12 @@ class NWmap extends Component {
       this.unsubscribe = this.refPoints.onSnapshot(this.onCollectionUpdate);
     }
     render(){
-        const mapCenter = [0,0];
+        const mapCenter = [10177,4887];
         const overstyle = {
             border: '1px solid',
             width: '100%'
         };
-        const bounds = [[-500,-500],[500,500]];      
+        const bounds = [[5840,-62.3],[14314,9835]];      
         return (
             <div style={overstyle}>
                 <h4>New World</h4>
@@ -129,6 +130,7 @@ class NWmap extends Component {
                     crs={CRS.Simple}
                     doubleClickZoom={false}
                     ondblclick={this.onDoubleClick}
+                    minZoom={-3}
                     >
                   <ImageOverlay
                     url={MapImage}
@@ -140,7 +142,6 @@ class NWmap extends Component {
             </div>
         );
   }
-  
 };
  
 export default NWmap;

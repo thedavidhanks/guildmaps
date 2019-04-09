@@ -45,11 +45,14 @@ class App extends Component {
     render(){
         return (
         <BrowserRouter>
-            <div className="container">
+            <div className="container-fluid">
                 <BSnavbar user={this.state.user} login={this.login} logout={this.logout}/>
                 <div role="main" className="row">
                     <Route exact path="/tools" component={ToolHome}/>
-                    <Route path="/tools/nwmap" component={NWmap} />
+                    <Route 
+                        path='/tools/nwmap'
+                        render={()=><MapPage user={this.state.user} />}
+                    />
                     <Route path="/rosters" component={ProjectHome}/>
                 </div>
             </div>
@@ -58,4 +61,15 @@ class App extends Component {
     }
 };
 
+//const MapPage = (props) => { props.user ? <NWmap  user={props.user} /> : <h4>Login required to view this page</h4>; };
+
+class MapPage extends Component{
+    render(){
+        return(
+        <div className="col">
+            {this.props.user ? <NWmap   user={this.props.user} /> : <h4>Login required to view this page</h4>}
+        </div>
+        );
+    };
+ };
 ReactDOM.render(<App />, document.getElementById('root'));
