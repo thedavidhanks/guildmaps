@@ -67,7 +67,9 @@ class MapPage extends Component{
     render(){
         return(
         <div className="col">
-            {this.props.user ? <NWmap   user={this.props.user} /> : <h4>Login required to view this page</h4>}
+            {//this.props.user ? <NWmap   user={this.props.user} /> : <h4>Login required to view this page</h4>}
+            null}
+            {true ? <NWmap   user={this.props.user} /> : <h4>Login required to view this page</h4>}
         </div>
         );
     };

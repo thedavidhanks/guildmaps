@@ -7,6 +7,10 @@
   height: 800px;
   width: 100%;
 }
+.marker_source{
+    font-size: x-small;
+    color: #bfbfbf;
+}
 .navbar{
     padding-top: 10px;
     margin: 0px;
