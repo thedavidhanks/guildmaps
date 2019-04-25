@@ -10,7 +10,7 @@ function SelectResource(props) {
         <option key={key} value={resource}>{resource}</option>
     );
     return(
-        <select name='newType' value={props.newType} onChange={props.handleChange}>
+        <select name='type' value={props.type} onChange={props.handleChange}>
             {resourceOptions}
         </select>);
 };
@@ -23,8 +23,8 @@ const NewMarker = props => {
             <Popup>
               <form onSubmit={props.handleSubmit}>
                 New Marker @ (x={props.position.lng},y={props.position.lat})<br />
-                <SelectResource resources={props.resources} newType={props.newType} handleChange={props.handleChange} /><br />
-                <textarea rows="6" name="newNotes" placeholder="Notes" onChange={props.handleChange} value={props.newNotes} /><br />
+                <SelectResource resources={props.resources} type={props.newType} handleChange={props.handleChange} /><br />
+                <textarea rows="6" name="notes" placeholder="Notes" onChange={props.handleChange} value={props.newNotes} /><br />
                 <button>Save</button>
               </form>
             </Popup>

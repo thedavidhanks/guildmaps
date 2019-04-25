@@ -3,11 +3,15 @@ import { ImageOverlay, Map, Marker, Popup } from 'react-leaflet';
 import { CRS } from 'leaflet';
 import firebase, { db } from '../firebase';
 import moment from 'moment';
+import { connect } from 'react-redux';
 
 //import MapImage from '../images/CombinedNW.png';
 import MapImage from './nwmap/New_World_Map_Dec_18.png';
 import { iconConstruction, iconSimpleBrown, iconSimpleGrey, iconSimpleGold, iconSimpleDarkPurple } from './nwmap/icons.js';
 import NewMarker from './nwmap/NewMarker';
+
+//actions
+import { createPoint } from '../store/actions/mapActions';
 
 function iconFromType(type){
     switch(type){
@@ -48,16 +52,18 @@ class NWmap extends Component {
         super();
         this.refPoints = db.collection('/Games/PM2ahWu01w0wb5KQcoV8/Points');
         this.state = {
-            newMarker: false,
-            newType: '',
-            newNotes: '',
             lat: 0,
             lng: 0,
             zoom: 0,
-            newMarkerLatLong: {},
             markers: [],
-            resources: ['wood', 'stone', 'iron', 'chest']
-            };
+            resources: ['wood', 'stone', 'iron', 'chest'],
+            markerPopup: {
+                visible: false,
+                type: 'wood',
+                notes: '',
+                latlong: {}
+            }
+        };
     };
     onCollectionUpdate = (points) =>{
         var markers = [];
@@ -75,23 +81,26 @@ class NWmap extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
+        this.props.createPoint(this.state.markerPopup);
         const now = new Date();
         const user = firebase.auth().currentUser;
         if(user){
             var newPoint = {
                 addedBy: user.email,
-                type: this.state.newType,
-                notes: this.state.newNotes,
-                latlong: {lat: this.state.newMarkerLatLong.lat, lng: this.state.newMarkerLatLong.lng},
+                type: this.state.markerPopup.type,
+                notes: this.state.markerPopup.notes,
+                latlong: {lat: this.state.markerPopup.latlong.lat, lng: this.state.markerPopup.latlong.lng},
                 addedOn: now
             };
 
             var fs_mapPoints = db.collection('/Games/PM2ahWu01w0wb5KQcoV8/Points');
             fs_mapPoints.add(newPoint).then( (docRef) => {console.log("Document written with ID: ", docRef.id);});
             this.setState({
-                newMarker: false,
-                newType: '',
-                newNotes: ''
+                markerPopup: {
+                    visible: false,
+                    type: 'wood',
+                    notes: ''
+                }
             });
         }else{
             //UPDATE: Change alert to Modal.
@@ -100,9 +109,16 @@ class NWmap extends Component {
         
     };
     handleChange = (e) => {
-        this.setState({
-        [e.target.name]: e.target.value
-    });
+        //notes and type for new markers are attached to markerPopup and should be handled differently.
+        if(e.target.name === 'notes' || e.target.name === 'type'){
+            var tempMarkerPopup = {...this.state.markerPopup};
+            tempMarkerPopup[e.target.name] = e.target.value;
+            this.setState({markerPopup: tempMarkerPopup});
+        }else{
+            this.setState({
+                [e.target.name]: e.target.value
+            });
+        }
 }
     onDoubleClick = (e) => {
         console.log(e.latlng);
@@ -110,10 +126,13 @@ class NWmap extends Component {
         //show a new marker at the coords
         if(user){
         //if(true){
-            this.setState({
-                newMarker: true,
-                newMarkerLatLong: e.latlng
-            });
+            var markerPopup = {...this.state.markerPopup};
+            //reset the propeties of the marker, but update the location.
+            markerPopup.visible = true;
+            markerPopup.notes = '';
+            markerPopup.type = 'wood';
+            markerPopup.latlong = e.latlng;
+            this.setState({markerPopup});
         }
         //close or lose focus, save the point.
     };
@@ -143,12 +162,18 @@ class NWmap extends Component {
                     url={MapImage}
                     bounds={bounds}
                   />
-                  {this.state.newMarker ? <NewMarker position={this.state.newMarkerLatLong} resources={this.state.resources} handleSubmit={this.handleSubmit} handleChange={this.handleChange} newNotes={this.state.newNotes} newType={this.state.newType}/> : null}
+                  {this.state.markerPopup.visible ? <NewMarker position={this.state.markerPopup.latlong} resources={this.state.resources} handleSubmit={this.handleSubmit} handleChange={this.handleChange} newNotes={this.state.markerPopup.notes} newType={this.state.markerPopup.type}/> : null}
                   {this.state.markers !== [] ? <MarkerList markers={this.state.markers} /> : null}
                 </Map>
             </div>
         );
   }
 };
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        createPoint: (point) => dispatch(createPoint(point))
+    };
+};
  
-export default NWmap;
+export default connect(null,mapDispatchToProps)(NWmap);

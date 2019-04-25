@@ -1,20 +1,18 @@
-import React, { Component } from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import React, { Component } from 'react'
+import { BrowserRouter, Route } from 'react-router-dom'
 import { auth, provider } from './firebase.js'
 
-import BSnavbar from './components/BSnavbar';
-import NWmap from './components/nwmap';
-import ProjectHome from './components/project_home';
-import SignIn from './components/auth/SignIn';
-import SignUp from './components/auth/SignUp';
-import ToolHome from './components/tool_home'
+import BSnavbar from './components/BSnavbar'
+import NWmap from './components/nwmap'
+import ProjectHome from './components/project_home'
+import SignIn from './components/auth/SignIn'
+import SignUp from './components/auth/SignUp'
+import MapsHome from './components/MapsHome'
+import Home from './components/Home'
 
 class App extends Component {
     constructor(props){
-        super(props);
-        //this.login = this.login.bind(this);
-        //this.logout = this.logout.bind(this);
-        
+        super(props);        
         this.state = { 
             menuItems: [
                 {name: "Tools", path: "/tools"}, 
@@ -48,7 +46,8 @@ class App extends Component {
             <div className="container-fluid">
                 <BSnavbar user={this.state.user} login={this.login} logout={this.logout}/>
                 <div role="main" className="row">
-                    <Route exact path="/maps" component={ToolHome}/>
+                    <Route path="/" exact component={Home} />
+                    <Route exact path="/maps" component={MapsHome}/>
                     <Route 
                         path='/maps/nwmap'
                         render={()=><MapPage user={this.state.user} />}
@@ -63,7 +62,6 @@ class App extends Component {
     }
 };
 
-//const MapPage = (props) => { props.user ? <NWmap  user={props.user} /> : <h4>Login required to view this page</h4>; };
 
 class MapPage extends Component{
     render(){
